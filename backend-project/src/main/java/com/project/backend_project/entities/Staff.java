@@ -18,7 +18,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name="staff") //This is a staff table
+@Table(name="staff")
 public class Staff implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
