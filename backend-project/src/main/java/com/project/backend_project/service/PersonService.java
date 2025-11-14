@@ -150,8 +150,8 @@ public class PersonService {
 
             }
         }
-        person.setDateOfBirth(dateOfBirth);
 
+        person.setDateOfBirth(dateOfBirth);
         person.setEmail(email);
 
         personRepo.save(person);

@@ -29,8 +29,8 @@ public class Person {
     @NotBlank(message = "Gender is required")
     private String gender;
 
-    // @NotBlank(message = "Date of Birth is required")
-    @Pattern(regexp ="^(0[1-9]|[12]\\d|3[01])/(0[1-9]|1[0-2])/\\\\d{4}$", message = "Date must be in the format DD/MM/YYYY")
+    @NotBlank(message = "Date of Birth is required")
+    @Pattern(regexp ="^(0[1-9]|[12]\\d|3[01])/(0[1-9]|1[0-2])/\\d{4}$", message = "Date must be in the format DD/MM/YYYY")
     private String dateOfBirth;
 
     private String marriageStatus;
