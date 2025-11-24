@@ -109,15 +109,6 @@ public class PersonService {
 
     String email = personRequest.getEmail();
     
-    person.setFirstName(firstName);
-    person.setMiddleName(middleName);
-    person.setLastName(lastName);
-    person.setGender(gender);
-    person.setMarriageStatus(marriageStatus);
-    person.setSpouseName(spouseName);
-    person.setIdentificationType(identificationType);
-    person.setAddress(address);
-    
     // Validating Identification Number
     String identificationNumber = cleanAndValidateNumber(personRequest.getIdentificationNumber(), "Identification Number");
         if(identificationNumber.length() != 20){
@@ -150,6 +141,16 @@ public class PersonService {
 
             }
         }
+
+
+        person.setFirstName(firstName);
+        person.setMiddleName(middleName);
+        person.setLastName(lastName);
+        person.setGender(gender);
+        person.setMarriageStatus(marriageStatus);
+        person.setSpouseName(spouseName);
+        person.setIdentificationType(identificationType);
+        person.setAddress(address);
 
         person.setDateOfBirth(dateOfBirth);
         person.setEmail(email);
