@@ -53,7 +53,7 @@ public class PersonController {
     // Update existing person
     @PutMapping("/update/{id}")
     public ResponseEntity<Map<String, Object>> updatePerson(@PathVariable Long id, @RequestBody PersonRequest updatePerson) {
-        Person existingPerson = personRepo.findById(id).orElse(null);
+         Person existingPerson = personRepo.findById(id).orElse(null);
 
         if (existingPerson == null) {
             return ResponseEntity.notFound().build();
@@ -84,6 +84,7 @@ public class PersonController {
        
 
         return ResponseEntity.ok(responseBody);
+       
     }
 
     
