@@ -5,6 +5,8 @@ import com.project.backend_project.entities.Person;
 
 public class PersonMapper {
 
+    private PersonMapper(){}
+
      // Convert DTO to Entity
     public static Person toEntity(PersonRequest dto) {
         Person person = new Person();

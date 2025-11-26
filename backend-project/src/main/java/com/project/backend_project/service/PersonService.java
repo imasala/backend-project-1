@@ -24,34 +24,35 @@ public class PersonService {
     private final Format format;
 
     private static final String STATUS_SUCCESS = "success";
+    private static final String STATUS_ERROR = "error";
     private static final String FIELD_MESSAGE = "message";
     private static final String FIELD_STATUS = "status";
 
     public Map<String, Object> validation(@RequestBody PersonRequest personRequest){
 
-    // Convert DTO to Entity
-    Person person = PersonMapper.toEntity(personRequest);
+        // Convert DTO to Entity
+        Person person = PersonMapper.toEntity(personRequest);
 
-    // Validate and Clean names
-    String firstName = CleanAndValidate.cleanAndValidateName(personRequest.getFirstName(), "First Name");
-    String middleName = CleanAndValidate.cleanAndValidateName(personRequest.getMiddleName(), "Middle Name");
-    String lastName = CleanAndValidate.cleanAndValidateName(personRequest.getLastName(), "Last Name");
-    String gender = CleanAndValidate.cleanAndValidateName(personRequest.getGender(), "Gender");
-    String marriageStatus = CleanAndValidate.cleanAndValidateName(personRequest.getMarriageStatus(), "Marriage Status");
-    String spouseName = CleanAndValidate.cleanAndValidateName(personRequest.getSpouseName(), "Spouse Name");
-    String identificationType = CleanAndValidate.cleanAndValidateName(personRequest.getIdentificationType(), "Identification Type");
-    String address = CleanAndValidate.cleanAndValidateName(personRequest.getAddress(), "Address");
+        // Validate and Clean names
+        String firstName = CleanAndValidate.cleanAndValidateName(personRequest.getFirstName(), "First Name");
+        String middleName = CleanAndValidate.cleanAndValidateName(personRequest.getMiddleName(), "Middle Name");
+        String lastName = CleanAndValidate.cleanAndValidateName(personRequest.getLastName(), "Last Name");
+        String gender = CleanAndValidate.cleanAndValidateName(personRequest.getGender(), "Gender");
+        String marriageStatus = CleanAndValidate.cleanAndValidateName(personRequest.getMarriageStatus(), "Marriage Status");
+        String spouseName = CleanAndValidate.cleanAndValidateName(personRequest.getSpouseName(), "Spouse Name");
+        String identificationType = CleanAndValidate.cleanAndValidateName(personRequest.getIdentificationType(), "Identification Type");
+        String address = CleanAndValidate.cleanAndValidateName(personRequest.getAddress(), "Address");
 
-    String email = personRequest.getEmail();
+        String email = personRequest.getEmail();
     
-    // Validating Identification Number
-    format.formatIdentificationNumber(person, personRequest);
+        // Validating Identification Number
+        format.formatIdentificationNumber(person, personRequest);
         
-    // Validating contact
-    format.formatContact(person, personRequest);
+        // Validating contact
+        format.formatContact(person, personRequest);
 
-    // Validating date
-    format.formatDateOfBirth(person, personRequest);
+        // Validating date
+        format.formatDateOfBirth(person, personRequest);
 
         person.setFirstName(firstName);
         person.setMiddleName(middleName);
@@ -73,11 +74,20 @@ public class PersonService {
 
     }
 
-    public ResponseEntity< Map<String, Object> > update(@PathVariable String lastName, @RequestBody PersonRequest updatePerson){
-         Person existingPerson = personRepo.findByLastName(lastName).orElse(null);
+    // Fetching all customer details
+    public Person search(@PathVariable String lastName){        
+        return personRepo.findByLastName(lastName).orElse(null);
+    }
+
+    public Map<String, Object>  update(@PathVariable String lastName, @RequestBody PersonRequest updatePerson){
+        Map<String, Object> responseBody = new HashMap<>();
+
+        Person existingPerson = personRepo.findByLastName(lastName).orElse(null);
 
         if (existingPerson == null) {
-            return ResponseEntity.notFound().build();
+            responseBody.put(FIELD_MESSAGE, STATUS_ERROR);
+            responseBody.put(FIELD_MESSAGE, "Person isnot found!");
+            return responseBody;
         }
 
         PersonMapper.updateEntity(existingPerson, updatePerson);
@@ -86,11 +96,25 @@ public class PersonService {
         personRepo.save(existingPerson);
         
         // Create response
-        Map<String, Object> responseBody = new HashMap<>();
+      
         responseBody.put(FIELD_STATUS, STATUS_SUCCESS);
         responseBody.put(FIELD_MESSAGE, "Data is successfully updated");
 
+        return responseBody;
+    }
+
+    public ResponseEntity< Map<String, Object>> delete(@PathVariable String lastName){
+         if(!personRepo.existsByLastName(lastName)){
+            return ResponseEntity.notFound().build();
+        }
+
+        personRepo.deleteByLastName(lastName);
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put(FIELD_STATUS,STATUS_SUCCESS);
+        responseBody.put(FIELD_MESSAGE, "Data is successfully deleted");
+
         return ResponseEntity.ok(responseBody);
+
     }
        
 }
