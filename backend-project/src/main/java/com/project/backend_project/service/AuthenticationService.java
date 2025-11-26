@@ -5,7 +5,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.project.backend_project.Role;
+import com.project.backend_project.enums.Role;
 import com.project.backend_project.dto.AuthenticationRequest;
 import com.project.backend_project.dto.AuthenticationResponse;
 import com.project.backend_project.dto.StaffRequest;

@@ -10,23 +10,26 @@ import com.project.backend_project.dto.AuthenticationResponse;
 import com.project.backend_project.dto.StaffRequest;
 import com.project.backend_project.service.AuthenticationService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/staffs")
+@SecurityRequirement(name = "bearerAuth")
 public class StaffController {
 
     
     private final AuthenticationService service;
 
-    @PostMapping("/api/staff/addReturn")
+    @PostMapping("/create")
     public ResponseEntity<AuthenticationResponse> staffRegister(@RequestBody StaffRequest request){ 
         return ResponseEntity.ok(service.staffRequest(request));
     }
 
-    @PostMapping("/api/auth/login")
+    @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> staffLogIn(@RequestBody AuthenticationRequest staffAuthentication){
         return ResponseEntity.ok(service.authenticate(staffAuthentication));
     }
-
   
 }
 

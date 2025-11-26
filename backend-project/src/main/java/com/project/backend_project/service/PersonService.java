@@ -2,9 +2,7 @@ package com.project.backend_project.service;
 
 import java.util.*;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.project.backend_project.dto.PersonRequest;
@@ -74,19 +72,26 @@ public class PersonService {
 
     }
 
-    // Fetching all customer details
-    public Person search(@PathVariable String lastName){        
+    public List<Person> getAllPerson(){
+        if(personRepo.findAll().isEmpty()){
+            throw new NoSuchElementException("No data found");
+        }
+        return personRepo.findAll();
+    }
+
+    // Fetching customer details by last name
+    public Person search(String lastName){        
         return personRepo.findByLastName(lastName).orElse(null);
     }
 
-    public Map<String, Object>  update(@PathVariable String lastName, @RequestBody PersonRequest updatePerson){
+    public Map<String, Object>  update(String lastName, PersonRequest updatePerson){
         Map<String, Object> responseBody = new HashMap<>();
 
         Person existingPerson = personRepo.findByLastName(lastName).orElse(null);
 
         if (existingPerson == null) {
-            responseBody.put(FIELD_MESSAGE, STATUS_ERROR);
-            responseBody.put(FIELD_MESSAGE, "Person isnot found!");
+            responseBody.put(FIELD_STATUS, STATUS_ERROR);
+            responseBody.put(FIELD_MESSAGE, "Person is not found!");
             return responseBody;
         }
 
@@ -96,24 +101,27 @@ public class PersonService {
         personRepo.save(existingPerson);
         
         // Create response
-      
         responseBody.put(FIELD_STATUS, STATUS_SUCCESS);
         responseBody.put(FIELD_MESSAGE, "Data is successfully updated");
 
         return responseBody;
     }
 
-    public ResponseEntity< Map<String, Object>> delete(@PathVariable String lastName){
-         if(!personRepo.existsByLastName(lastName)){
-            return ResponseEntity.notFound().build();
+    // Delete person
+    public Map<String, Object> delete(String lastName){
+        Map<String, Object> responseBody = new HashMap<>();
+
+        if(!personRepo.existsByLastName(lastName)){
+            responseBody.put(FIELD_STATUS, STATUS_ERROR);
+            responseBody.put(FIELD_MESSAGE, "Person is not found!");
+            return responseBody;
         }
 
         personRepo.deleteByLastName(lastName);
-        Map<String, Object> responseBody = new HashMap<>();
         responseBody.put(FIELD_STATUS,STATUS_SUCCESS);
         responseBody.put(FIELD_MESSAGE, "Data is successfully deleted");
 
-        return ResponseEntity.ok(responseBody);
+        return responseBody;
 
     }
        

@@ -3,7 +3,6 @@ package com.project.backend_project.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.project.backend_project.entities.Person;
-import java.util.List;
 import java.util.Optional;
 
 

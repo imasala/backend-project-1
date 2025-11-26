@@ -1,4 +1,4 @@
-package com.project.backend_project;
+package com.project.backend_project.enums;
 
 public enum Role {
     USER,

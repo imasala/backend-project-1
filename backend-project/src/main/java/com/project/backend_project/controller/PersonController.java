@@ -4,9 +4,9 @@ import java.util.*;
 
 import com.project.backend_project.dto.PersonRequest;
 import com.project.backend_project.entities.Person;
-import com.project.backend_project.repository.PersonRepo;
 import com.project.backend_project.service.PersonService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -16,26 +16,26 @@ import org.springframework.web.bind.annotation.*;
 // Controller must have the responseEntity 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/customers")
+@SecurityRequirement(name = "bearerAuth")
 public class PersonController {
 
-    private final PersonRepo personRepo;
     private final PersonService personService;
 
     // Create and return response
-    @PostMapping("/addReturn")
+    @PostMapping("/create")
     public ResponseEntity< Map<String, Object> > createPerson(@RequestBody PersonRequest personRequest) {
         return ResponseEntity.ok(personService.validation(personRequest));
     }
 
     // Fetch all persons
-    @GetMapping("/all")
-    public List<Person> getAllPerson() {
-        return personRepo.findAll();
+    @GetMapping("/fetch-all")
+    public ResponseEntity<List<Person>> getAllPerson() {
+        return ResponseEntity.ok(personService.getAllPerson());
     }
 
     // Fetch by ID
-    @GetMapping("/{lastName}")
+    @GetMapping("/fetch/{lastName}")
     public ResponseEntity<Person> getPerson(@PathVariable String lastName) {
        return ResponseEntity.ok(personService.search(lastName));
     }
@@ -47,9 +47,9 @@ public class PersonController {
        return  ResponseEntity.ok(personService.update(lastName, updatePerson));
     }
 
-    
+    // Delete person
     @DeleteMapping("/delete/{lastName}")
     public ResponseEntity<Map<String, Object>> deletePerson(@PathVariable String lastName) {
-       return personService.delete(lastName);
+       return ResponseEntity.ok(personService.delete(lastName));
     }
 }
