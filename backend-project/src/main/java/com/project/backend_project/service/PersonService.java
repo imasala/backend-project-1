@@ -66,12 +66,13 @@ public class PersonService {
 
         Map<String, Object> response = new HashMap<>();
         response.put(FIELD_STATUS, STATUS_SUCCESS);
-        response.put(FIELD_MESSAGE,"Person is added successfully");
+        response.put(FIELD_MESSAGE,"Customer is added successfully");
 
         return response;
 
     }
 
+    
     public List<Person> getAllPerson(){
         if(personRepo.findAll().isEmpty()){
             throw new NoSuchElementException("No data found");
@@ -80,18 +81,19 @@ public class PersonService {
     }
 
     // Fetching customer details by last name
-    public Person search(String lastName){        
-        return personRepo.findByLastName(lastName).orElse(null);
+    public List<Person> search(String lastName){        
+        return personRepo.findByLastName(lastName);
     }
 
-    public Map<String, Object>  update(String lastName, PersonRequest updatePerson){
+    // Updating person details
+    public Map<String, Object>  update(String email, PersonRequest updatePerson){
         Map<String, Object> responseBody = new HashMap<>();
 
-        Person existingPerson = personRepo.findByLastName(lastName).orElse(null);
+        Person existingPerson = personRepo.findByEmail(email).orElse(null);
 
         if (existingPerson == null) {
             responseBody.put(FIELD_STATUS, STATUS_ERROR);
-            responseBody.put(FIELD_MESSAGE, "Person is not found!");
+            responseBody.put(FIELD_MESSAGE, "Customer is not found!");
             return responseBody;
         }
 
@@ -113,7 +115,7 @@ public class PersonService {
 
         if(!personRepo.existsByLastName(lastName)){
             responseBody.put(FIELD_STATUS, STATUS_ERROR);
-            responseBody.put(FIELD_MESSAGE, "Person is not found!");
+            responseBody.put(FIELD_MESSAGE, "Customer is not found!");
             return responseBody;
         }
 
@@ -123,6 +125,17 @@ public class PersonService {
 
         return responseBody;
 
+    }
+
+    // Delete all persons
+    public Map<String, String> deleteAll() {
+        personRepo.deleteAll();
+
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put(FIELD_STATUS, STATUS_SUCCESS);
+        responseBody.put(FIELD_MESSAGE, "All Customer details have been deleted successfully.");
+
+        return responseBody;
     }
        
 }

@@ -52,5 +52,6 @@ public class Person {
     private String address;
 
     @Email(message = "Email must be valid")
+    @Column(unique = true)
     private String email;
 }

@@ -34,22 +34,27 @@ public class PersonController {
         return ResponseEntity.ok(personService.getAllPerson());
     }
 
-    // Fetch by ID
+    // Fetch by last name
     @GetMapping("/fetch/{lastName}")
-    public ResponseEntity<Person> getPerson(@PathVariable String lastName) {
+    public ResponseEntity<List<Person>> getPersons(@PathVariable String lastName) {
        return ResponseEntity.ok(personService.search(lastName));
     }
 
     // Update existing person
-    @PutMapping("/update/{lastName}")
-    public ResponseEntity< Map<String, Object> > updatePerson(@PathVariable String lastName, @RequestBody PersonRequest updatePerson) {
+    @PutMapping("/update/{email}")
+    public ResponseEntity< Map<String, Object> > updatePerson(@PathVariable String email, @RequestBody PersonRequest updatePerson) {
          
-       return  ResponseEntity.ok(personService.update(lastName, updatePerson));
+       return  ResponseEntity.ok(personService.update(email, updatePerson));
     }
 
     // Delete person
-    @DeleteMapping("/delete/{lastName}")
-    public ResponseEntity<Map<String, Object>> deletePerson(@PathVariable String lastName) {
-       return ResponseEntity.ok(personService.delete(lastName));
+    @DeleteMapping("/delete/{email}")
+    public ResponseEntity<Map<String, Object>> deletePerson(@PathVariable String email) {
+       return ResponseEntity.ok(personService.delete(email));
+    }
+
+    @DeleteMapping("/delete-all")
+    public ResponseEntity<Map<String, String>> deleteAllPersons() {
+      return ResponseEntity.ok(personService.deleteAll());
     }
 }
