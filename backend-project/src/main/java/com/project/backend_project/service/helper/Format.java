@@ -2,8 +2,8 @@ package com.project.backend_project.service.helper;
 
 import org.springframework.stereotype.Service;
 
-import com.project.backend_project.dto.PersonRequest;
-import com.project.backend_project.entities.Person;
+import com.project.backend_project.dto.CustomerRequest;
+import com.project.backend_project.entities.Customer;
 
 import lombok.RequiredArgsConstructor;
 
@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 public class Format {
 
      // Validating Identification Number
-    public void formatIdentificationNumber(Person person, PersonRequest personRequest){
+    public void formatIdentificationNumber(Customer customer, CustomerRequest personRequest){
     String identificationNumber = CleanAndValidate.cleanAndValidateNumber(personRequest.getIdentificationNumber(), "Identification Number");
         if(identificationNumber.length() != 20){
             throw new IllegalArgumentException("Identification Number must have 20 digits");
@@ -22,24 +22,24 @@ public class Format {
             String part3 = identificationNumber.substring(13,18);
             String part4 = identificationNumber.substring(18,20);
 
-            person.setIdentificationNumber(part1 + "-" + part2 + "-" + part3 + "-" + part4);
+            customer.setIdentificationNumber(part1 + "-" + part2 + "-" + part3 + "-" + part4);
         }
     }
 
     // Validating contact
-    public void formatContact(Person person, PersonRequest personRequest){
+    public void formatContact(Customer customer, CustomerRequest personRequest){
            String contact = CleanAndValidate.cleanAndValidateNumber(personRequest.getContact(), "Contact");
             if (contact.startsWith("0")){
                 contact = "+255(0)" + contact.substring(1);
                }else if(!contact.startsWith("+255")){
                 contact = "+255(0)" + contact;
             }
-            person.setContact(contact);
+            customer.setContact(contact);
 
     }
 
     // Validating date
-    public void formatDateOfBirth(Person person, PersonRequest personRequest){
+    public void formatDateOfBirth(Customer customer, CustomerRequest personRequest){
          String dateOfBirth = personRequest.getDateOfBirth();
         if(dateOfBirth != null){
             dateOfBirth = dateOfBirth.trim();
@@ -47,7 +47,7 @@ public class Format {
                 throw new IllegalArgumentException("Please enter the appropiate date format");
             }
         } 
-        person.setDateOfBirth(dateOfBirth);   
+        customer.setDateOfBirth(dateOfBirth);   
     }
     
 }

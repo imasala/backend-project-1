@@ -7,8 +7,8 @@ import lombok.Data;
  
 @Entity
 @Data
-@Table(name = "person")
-public class Person {
+@Table(name = "customer")
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,4 +54,5 @@ public class Person {
     @Email(message = "Email must be valid")
     @Column(unique = true)
     private String email;
+
 }

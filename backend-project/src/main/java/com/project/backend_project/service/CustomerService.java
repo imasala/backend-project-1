@@ -5,10 +5,10 @@ import java.util.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.project.backend_project.dto.PersonRequest;
-import com.project.backend_project.entities.Person;
-import com.project.backend_project.mapper.PersonMapper;
-import com.project.backend_project.repository.PersonRepo;
+import com.project.backend_project.dto.CustomerRequest;
+import com.project.backend_project.entities.Customer;
+import com.project.backend_project.mapper.CustomerMapper;
+import com.project.backend_project.repository.CustomerRepo;
 import com.project.backend_project.service.helper.CleanAndValidate;
 import com.project.backend_project.service.helper.Format;
 
@@ -16,9 +16,9 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class PersonService {
+public class CustomerService {
 
-    private final PersonRepo personRepo;
+    private final CustomerRepo customerRepo;
     private final Format format;
 
     private static final String STATUS_SUCCESS = "success";
@@ -26,10 +26,10 @@ public class PersonService {
     private static final String FIELD_MESSAGE = "message";
     private static final String FIELD_STATUS = "status";
 
-    public Map<String, Object> validation(@RequestBody PersonRequest personRequest){
+    public Map<String, Object> validation(@RequestBody CustomerRequest personRequest){
 
         // Convert DTO to Entity
-        Person person = PersonMapper.toEntity(personRequest);
+        Customer person = CustomerMapper.toEntity(personRequest);
 
         // Validate and Clean names
         String firstName = CleanAndValidate.cleanAndValidateName(personRequest.getFirstName(), "First Name");
@@ -62,7 +62,7 @@ public class PersonService {
         person.setAddress(address);
         person.setEmail(email);
 
-        personRepo.save(person);
+        customerRepo.save(person);
 
         Map<String, Object> response = new HashMap<>();
         response.put(FIELD_STATUS, STATUS_SUCCESS);
@@ -73,23 +73,23 @@ public class PersonService {
     }
 
     
-    public List<Person> getAllPerson(){
-        if(personRepo.findAll().isEmpty()){
+    public List<Customer> getAllPerson(){
+        if(customerRepo.findAll().isEmpty()){
             throw new NoSuchElementException("No data found");
         }
-        return personRepo.findAll();
+        return customerRepo.findAll();
     }
 
     // Fetching customer details by last name
-    public List<Person> search(String lastName){        
-        return personRepo.findByLastName(lastName);
+    public List<Customer> search(String lastName){        
+        return customerRepo.findByLastName(lastName);
     }
 
     // Updating person details
-    public Map<String, Object>  update(String email, PersonRequest updatePerson){
+    public Map<String, Object>  update(String email, CustomerRequest updatePerson){
         Map<String, Object> responseBody = new HashMap<>();
 
-        Person existingPerson = personRepo.findByEmail(email).orElse(null);
+        Customer existingPerson = customerRepo.findByEmail(email).orElse(null);
 
         if (existingPerson == null) {
             responseBody.put(FIELD_STATUS, STATUS_ERROR);
@@ -97,10 +97,10 @@ public class PersonService {
             return responseBody;
         }
 
-        PersonMapper.updateEntity(existingPerson, updatePerson);
+        CustomerMapper.updateEntity(existingPerson, updatePerson);
        
         // Save updated record in the database
-        personRepo.save(existingPerson);
+        customerRepo.save(existingPerson);
         
         // Create response
         responseBody.put(FIELD_STATUS, STATUS_SUCCESS);
@@ -113,13 +113,13 @@ public class PersonService {
     public Map<String, Object> delete(String lastName){
         Map<String, Object> responseBody = new HashMap<>();
 
-        if(!personRepo.existsByLastName(lastName)){
+        if(!customerRepo.existsByLastName(lastName)){
             responseBody.put(FIELD_STATUS, STATUS_ERROR);
             responseBody.put(FIELD_MESSAGE, "Customer is not found!");
             return responseBody;
         }
 
-        personRepo.deleteByLastName(lastName);
+        customerRepo.deleteByLastName(lastName);
         responseBody.put(FIELD_STATUS,STATUS_SUCCESS);
         responseBody.put(FIELD_MESSAGE, "Data is successfully deleted");
 
@@ -129,7 +129,7 @@ public class PersonService {
 
     // Delete all persons
     public Map<String, String> deleteAll() {
-        personRepo.deleteAll();
+        customerRepo.deleteAll();
 
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put(FIELD_STATUS, STATUS_SUCCESS);

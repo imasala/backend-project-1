@@ -6,7 +6,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PersonRequest {
+public class CustomerRequest {
     private String firstName;
     private String middleName;
     private String lastName;
@@ -19,4 +19,5 @@ public class PersonRequest {
     private String identificationType;
     private String address;
     private String email;
+
 }
