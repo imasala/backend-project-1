@@ -15,6 +15,8 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
 
     private static final String SECRET_KEY = "bbdcd54305a38ef0b53460567e3fc060216fb3a08a345bacd7a452d468b8fc58";
+    private static final long EXPIRATION_TIME = (long) 1000 * 20; // 20 seconds
+    private static final long REFRESH_EXPIRATION_TIME = (long) 1000 * 60 * 60 * 24 * 7; // 7 days
 
     public String extractDomainEmail(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -30,17 +32,23 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails){
+        return buildToken(extraClaims, userDetails, EXPIRATION_TIME);
+    }
+
+     public String generateRefreshToken( UserDetails userDetails){
+        return buildToken(new HashMap<>(), userDetails, REFRESH_EXPIRATION_TIME);
+    }
+
+    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expirationTime){
         return Jwts
         .builder()
         .setClaims(extraClaims)
         .setSubject(userDetails.getUsername())
         .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 3))
+        .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
         .signWith(getSignInKey(), SignatureAlgorithm.HS256)
         .compact();
     }
-
-
 
     public boolean isTokenValid(String token, UserDetails userDetails){
         final String domainEmail = extractDomainEmail(token);
