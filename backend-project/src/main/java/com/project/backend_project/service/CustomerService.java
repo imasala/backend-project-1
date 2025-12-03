@@ -2,6 +2,7 @@ package com.project.backend_project.service;
 
 import java.util.*;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -26,43 +27,44 @@ public class CustomerService {
     private static final String FIELD_MESSAGE = "message";
     private static final String FIELD_STATUS = "status";
 
-    public Map<String, Object> validation(@RequestBody CustomerRequest personRequest){
+    public Map<String, Object> validation(@RequestBody CustomerRequest customerRequest){
 
         // Convert DTO to Entity
-        Customer person = CustomerMapper.toEntity(personRequest);
+        Customer customer = CustomerMapper.toEntity(customerRequest);
 
         // Validate and Clean names
-        String firstName = CleanAndValidate.cleanAndValidateName(personRequest.getFirstName(), "First Name");
-        String middleName = CleanAndValidate.cleanAndValidateName(personRequest.getMiddleName(), "Middle Name");
-        String lastName = CleanAndValidate.cleanAndValidateName(personRequest.getLastName(), "Last Name");
-        String gender = CleanAndValidate.cleanAndValidateName(personRequest.getGender(), "Gender");
-        String marriageStatus = CleanAndValidate.cleanAndValidateName(personRequest.getMarriageStatus(), "Marriage Status");
-        String spouseName = CleanAndValidate.cleanAndValidateName(personRequest.getSpouseName(), "Spouse Name");
-        String identificationType = CleanAndValidate.cleanAndValidateName(personRequest.getIdentificationType(), "Identification Type");
-        String address = CleanAndValidate.cleanAndValidateName(personRequest.getAddress(), "Address");
+        String firstName = CleanAndValidate.cleanAndValidateName(customerRequest.getFirstName(), "First Name");
+        String middleName = CleanAndValidate.cleanAndValidateName(customerRequest.getMiddleName(), "Middle Name");
+        String lastName = CleanAndValidate.cleanAndValidateName(customerRequest.getLastName(), "Last Name");
+        String gender = CleanAndValidate.cleanAndValidateName(customerRequest.getGender(), "Gender");
+        String marriageStatus = CleanAndValidate.cleanAndValidateName(customerRequest.getMarriageStatus(), "Marriage Status");
+        String spouseName = CleanAndValidate.cleanAndValidateName(customerRequest.getSpouseName(), "Spouse Name");
+        String identificationType = CleanAndValidate.cleanAndValidateName(customerRequest.getIdentificationType(), "Identification Type");
+        String address = CleanAndValidate.cleanAndValidateName(customerRequest.getAddress(), "Address");
 
-        String email = personRequest.getEmail();
+        String email = customerRequest.getEmail();
     
         // Validating Identification Number
-        format.formatIdentificationNumber(person, personRequest);
+        format.formatIdentificationNumber(customer, customerRequest);
         
         // Validating contact
-        format.formatContact(person, personRequest);
+        format.formatContact(customer, customerRequest);
 
         // Validating date
-        format.formatDateOfBirth(person, personRequest);
+        format.formatDateOfBirth(customer, customerRequest);
 
-        person.setFirstName(firstName);
-        person.setMiddleName(middleName);
-        person.setLastName(lastName);
-        person.setGender(gender);
-        person.setMarriageStatus(marriageStatus);
-        person.setSpouseName(spouseName);
-        person.setIdentificationType(identificationType);
-        person.setAddress(address);
-        person.setEmail(email);
+        customer.setFirstName(firstName);
+        customer.setMiddleName(middleName);
+        customer.setLastName(lastName);
+        customer.setGender(gender);
+        customer.setMarriageStatus(marriageStatus);
+        customer.setSpouseName(spouseName);
+        customer.setIdentificationType(identificationType);
+        customer.setAddress(address);
+        customer.setEmail(email);
+        
 
-        customerRepo.save(person);
+        customerRepo.save(customer);
 
         Map<String, Object> response = new HashMap<>();
         response.put(FIELD_STATUS, STATUS_SUCCESS);
@@ -86,18 +88,63 @@ public class CustomerService {
     }
 
     // Updating person details
-    public Map<String, Object>  update(String email, CustomerRequest updatePerson){
+    public ResponseEntity <Map<String, Object>>  update(Long id, CustomerRequest updateCustomer){
         Map<String, Object> responseBody = new HashMap<>();
 
-        Customer existingPerson = customerRepo.findByEmail(email).orElse(null);
+        Customer existingPerson = customerRepo.findById(id).orElse(null);
 
         if (existingPerson == null) {
             responseBody.put(FIELD_STATUS, STATUS_ERROR);
             responseBody.put(FIELD_MESSAGE, "Customer is not found!");
-            return responseBody;
+            return ResponseEntity.badRequest().body(responseBody);
         }
 
-        CustomerMapper.updateEntity(existingPerson, updatePerson);
+         String newEmail = updateCustomer.getEmail();
+        if(newEmail != null && !newEmail.equals(existingPerson.getEmail())){
+            existingPerson.setEmail(newEmail);
+        }
+
+        CleanAndValidate.cleanAndValidateName(updateCustomer.getFirstName(), "First Name");
+        CleanAndValidate.cleanAndValidateName(updateCustomer.getMiddleName(), "Middle Name");
+        CleanAndValidate.cleanAndValidateName(updateCustomer.getLastName(), "Last Name");
+        CleanAndValidate.cleanAndValidateName(updateCustomer.getGender(), "Gender");
+        CleanAndValidate.cleanAndValidateName(updateCustomer.getMarriageStatus(), "Marriage Status");
+        CleanAndValidate.cleanAndValidateName(updateCustomer.getSpouseName(), "Spouse Name");
+        CleanAndValidate.cleanAndValidateName(updateCustomer.getIdentificationType(), "Identification Type");
+        CleanAndValidate.cleanAndValidateName(updateCustomer.getAddress(), "Address");
+
+         // Validating Identification Number
+         String newIdentificationNumber = updateCustomer.getIdentificationNumber();
+         if(newIdentificationNumber != null && !newIdentificationNumber.equals(existingPerson.getIdentificationNumber())){
+            format.formatIdentificationNumber(existingPerson, updateCustomer);
+         }else{
+            existingPerson.setIdentificationNumber(existingPerson.getIdentificationNumber());
+         }
+        
+        // Validating contact
+        String newContact = updateCustomer.getContact();
+        if(newContact != null && !newContact.equals(existingPerson.getContact())){
+        format.formatContact(existingPerson, updateCustomer);
+        }else{
+            existingPerson.setContact(existingPerson.getContact());
+        }
+
+        // Validating date
+        // String newDateOfBirth = updateCustomer.getDateOfBirth();
+        // if(newDateOfBirth != null && !newDateOfBirth.equals(existingPerson.getDateOfBirth())){
+        //     format.formatDateOfBirth(existingPerson, updateCustomer);
+        // }else{
+        //     existingPerson.setDateOfBirth(existingPerson.getDateOfBirth());
+        //     format.formatDateOfBirth(existingPerson, updateCustomer);
+        // }
+        if (updateCustomer.getDateOfBirth() != null){
+        format.formatDateOfBirth(existingPerson, updateCustomer);
+        }else{
+            
+        }
+
+
+        CustomerMapper.updateEntity(existingPerson, updateCustomer);
        
         // Save updated record in the database
         customerRepo.save(existingPerson);
@@ -105,37 +152,36 @@ public class CustomerService {
         // Create response
         responseBody.put(FIELD_STATUS, STATUS_SUCCESS);
         responseBody.put(FIELD_MESSAGE, "Data is successfully updated");
-
-        return responseBody;
+        return ResponseEntity.ok(responseBody);
     }
 
     // Delete person
-    public Map<String, Object> delete(String lastName){
+    public ResponseEntity<Map<String, Object>> delete(String lastName){
         Map<String, Object> responseBody = new HashMap<>();
 
         if(!customerRepo.existsByLastName(lastName)){
             responseBody.put(FIELD_STATUS, STATUS_ERROR);
             responseBody.put(FIELD_MESSAGE, "Customer is not found!");
-            return responseBody;
+            return ResponseEntity.badRequest().body(responseBody);
         }
 
         customerRepo.deleteByLastName(lastName);
         responseBody.put(FIELD_STATUS,STATUS_SUCCESS);
         responseBody.put(FIELD_MESSAGE, "Data is successfully deleted");
 
-        return responseBody;
+        return ResponseEntity.ok(responseBody);
 
     }
 
     // Delete all persons
-    public Map<String, String> deleteAll() {
+    public ResponseEntity<Map<String, String>> deleteAll() {
         customerRepo.deleteAll();
 
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put(FIELD_STATUS, STATUS_SUCCESS);
         responseBody.put(FIELD_MESSAGE, "All Customer details have been deleted successfully.");
 
-        return responseBody;
+        return ResponseEntity.ok(responseBody);
     }
        
 }

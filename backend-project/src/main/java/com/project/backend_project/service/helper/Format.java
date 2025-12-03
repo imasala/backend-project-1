@@ -5,10 +5,7 @@ import org.springframework.stereotype.Service;
 import com.project.backend_project.dto.CustomerRequest;
 import com.project.backend_project.entities.Customer;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class Format {
 
      // Validating Identification Number
@@ -29,12 +26,18 @@ public class Format {
     // Validating contact
     public void formatContact(Customer customer, CustomerRequest personRequest){
            String contact = CleanAndValidate.cleanAndValidateNumber(personRequest.getContact(), "Contact");
+
+           if(contact.length() != 10){
+                throw new IllegalArgumentException("Contact must have at least 10 digits");
+              }else {
+
             if (contact.startsWith("0")){
-                contact = "+255(0)" + contact.substring(1);
-               }else if(!contact.startsWith("+255")){
+                    contact = "+255(0)" + contact.substring(1);
+                }else if(!contact.startsWith("+255")){
                 contact = "+255(0)" + contact;
             }
             customer.setContact(contact);
+        }
 
     }
 

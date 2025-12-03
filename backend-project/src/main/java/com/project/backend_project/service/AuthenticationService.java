@@ -86,13 +86,16 @@ public class AuthenticationService {
 
     // Changes here
     private void revokeAllUserTokens(Staff staff) {
+
         var validUserTokens = tokenRepo.findAllValidTokenByUser(staff.getId());
+
         if (validUserTokens.isEmpty())
             return;
         validUserTokens.forEach(token -> {
             token.setExpired(true);
             token.setRevoked(true);
         });
+        
         tokenRepo.saveAll(validUserTokens);
     }
 
@@ -100,26 +103,32 @@ public class AuthenticationService {
         HttpServletRequest request,
         HttpServletResponse response
     ) throws IOException {
-         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+                final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
                 final String refreshToken;
                 final String domainEmail;
 
                 if(authHeader == null || !authHeader.startsWith("Bearer")){
                     return; // Stops execution if no token
                 }
+
                 refreshToken = authHeader.substring(7);
                 domainEmail = jwtService.extractDomainEmail(refreshToken);
+
                 if(domainEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
                     var userDetails = this.staffRepo.findByDomainEmail(domainEmail).orElseThrow();
+                    
                     if(jwtService.isTokenValid(refreshToken, userDetails)){
 
                         var accessToken = jwtService.generateToken(userDetails);
                         revokeAllUserTokens(userDetails);
                         saveUserToken(userDetails, accessToken);
+
                         var authResponse = AuthenticationResponse.builder()
                         .token(accessToken)
                         .refreshToken(refreshToken)
                         .build();
+
                     new  ObjectMapper().writeValue(response.getOutputStream(), authResponse);
                     }
                 }

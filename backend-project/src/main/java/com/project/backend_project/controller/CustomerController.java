@@ -41,20 +41,20 @@ public class CustomerController {
     }
 
     // Update existing person
-    @PutMapping("/update/{email}")
-    public ResponseEntity< Map<String, Object> > updatePerson(@PathVariable String email, @RequestBody CustomerRequest updatePerson) {
+    @PutMapping("/update/{id}")
+    public ResponseEntity< Map<String, Object> > updatePerson(@PathVariable Long id, @RequestBody CustomerRequest updatePerson) {
   
-       return  ResponseEntity.ok(customerService.update(email, updatePerson));
+       return  customerService.update(id, updatePerson);
     }
 
     // Delete person
-    @DeleteMapping("/delete/{lastName}")
-    public ResponseEntity<Map<String, Object>> deletePerson(@PathVariable String lastName) {
-       return ResponseEntity.ok(customerService.delete(lastName));
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Map<String, Object>> deletePerson(@PathVariable String id) {
+       return customerService.delete(id);
     }
 
     @DeleteMapping("/delete-all")
     public ResponseEntity<Map<String, String>> deleteAllPersons() {
-      return ResponseEntity.ok(customerService.deleteAll());
+      return customerService.deleteAll();
     }
 }
