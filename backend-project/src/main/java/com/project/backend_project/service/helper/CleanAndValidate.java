@@ -12,7 +12,7 @@ public class CleanAndValidate {
         value = value.trim().replaceAll("\\s+", "");
 
         if(!value.matches("\\d+")){
-            throw new IllegalArgumentException(fieldName + "must contain digits only");
+            throw new IllegalArgumentException(fieldName + " must contain digits only");
         }
         return value;
     }

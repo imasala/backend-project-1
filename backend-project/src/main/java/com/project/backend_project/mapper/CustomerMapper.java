@@ -26,7 +26,7 @@ public class CustomerMapper {
         return customer;
     }
 
-    // Update existing entity with DTO
+    // Update existing entity with DTO: Contact, Identification Number, Date of Birth aren't included here as they are handled separately
     public static void updateEntity(Customer customer, CustomerRequest dto) {
         customer.setFirstName(dto.getFirstName());
         customer.setMiddleName(dto.getMiddleName());
@@ -35,8 +35,6 @@ public class CustomerMapper {
         customer.setDateOfBirth(dto.getDateOfBirth());
         customer.setMarriageStatus(dto.getMarriageStatus());
         customer.setSpouseName(dto.getSpouseName());
-        customer.setContact(dto.getContact());
-        customer.setIdentificationNumber(dto.getIdentificationNumber());
         customer.setIdentificationType(dto.getIdentificationType());
         customer.setAddress(dto.getAddress());
     }

@@ -88,7 +88,7 @@ public class CustomerService {
     }
 
     // Updating person details
-    public ResponseEntity <Map<String, Object>>  update(Long id, CustomerRequest updateCustomer){
+    public ResponseEntity <Map<String, Object>>  update(Long id, CustomerRequest updateCustomerRequest){
         Map<String, Object> responseBody = new HashMap<>();
 
         Customer existingPerson = customerRepo.findById(id).orElse(null);
@@ -99,57 +99,43 @@ public class CustomerService {
             return ResponseEntity.badRequest().body(responseBody);
         }
 
-         String newEmail = updateCustomer.getEmail();
-        if(newEmail != null && !newEmail.equals(existingPerson.getEmail())){
-            existingPerson.setEmail(newEmail);
+        if(updateCustomerRequest.getEmail() != null){
+            existingPerson.setEmail(updateCustomerRequest.getEmail());
         }
 
-        CleanAndValidate.cleanAndValidateName(updateCustomer.getFirstName(), "First Name");
-        CleanAndValidate.cleanAndValidateName(updateCustomer.getMiddleName(), "Middle Name");
-        CleanAndValidate.cleanAndValidateName(updateCustomer.getLastName(), "Last Name");
-        CleanAndValidate.cleanAndValidateName(updateCustomer.getGender(), "Gender");
-        CleanAndValidate.cleanAndValidateName(updateCustomer.getMarriageStatus(), "Marriage Status");
-        CleanAndValidate.cleanAndValidateName(updateCustomer.getSpouseName(), "Spouse Name");
-        CleanAndValidate.cleanAndValidateName(updateCustomer.getIdentificationType(), "Identification Type");
-        CleanAndValidate.cleanAndValidateName(updateCustomer.getAddress(), "Address");
+        CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getFirstName(), "First Name");
+        CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getMiddleName(), "Middle Name");
+        CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getLastName(), "Last Name");
+        CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getGender(), "Gender");
+        CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getMarriageStatus(), "Marriage Status");
+        CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getSpouseName(), "Spouse Name");
+        CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getIdentificationType(), "Identification Type");
+        CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getAddress(), "Address");
 
          // Validating Identification Number
-         String newIdentificationNumber = updateCustomer.getIdentificationNumber();
-         if(newIdentificationNumber != null && !newIdentificationNumber.equals(existingPerson.getIdentificationNumber())){
-            format.formatIdentificationNumber(existingPerson, updateCustomer);
+         if(updateCustomerRequest.getIdentificationNumber()!= null){
+            format.formatIdentificationNumber(existingPerson, updateCustomerRequest);
          }else{
             existingPerson.setIdentificationNumber(existingPerson.getIdentificationNumber());
-         }
-        
+         }  
+
         // Validating contact
-        String newContact = updateCustomer.getContact();
-        if(newContact != null && !newContact.equals(existingPerson.getContact())){
-        format.formatContact(existingPerson, updateCustomer);
+        if (updateCustomerRequest.getContact() != null) {
+        format.formatContact(existingPerson, updateCustomerRequest);  
         }else{
             existingPerson.setContact(existingPerson.getContact());
         }
 
         // Validating date
-        // String newDateOfBirth = updateCustomer.getDateOfBirth();
-        // if(newDateOfBirth != null && !newDateOfBirth.equals(existingPerson.getDateOfBirth())){
-        //     format.formatDateOfBirth(existingPerson, updateCustomer);
-        // }else{
-        //     existingPerson.setDateOfBirth(existingPerson.getDateOfBirth());
-        //     format.formatDateOfBirth(existingPerson, updateCustomer);
-        // }
-        if (updateCustomer.getDateOfBirth() != null){
-        format.formatDateOfBirth(existingPerson, updateCustomer);
-        }else{
-            
+        if (updateCustomerRequest.getDateOfBirth() != null){
+        format.formatDateOfBirth(existingPerson, updateCustomerRequest);
         }
 
-
-        CustomerMapper.updateEntity(existingPerson, updateCustomer);
+        CustomerMapper.updateEntity(existingPerson, updateCustomerRequest);
        
         // Save updated record in the database
         customerRepo.save(existingPerson);
         
-        // Create response
         responseBody.put(FIELD_STATUS, STATUS_SUCCESS);
         responseBody.put(FIELD_MESSAGE, "Data is successfully updated");
         return ResponseEntity.ok(responseBody);

@@ -41,16 +41,16 @@ public class CustomerController {
     }
 
     // Update existing person
-    @PutMapping("/update/{id}")
+    @PatchMapping("/update/{id}")
     public ResponseEntity< Map<String, Object> > updatePerson(@PathVariable Long id, @RequestBody CustomerRequest updatePerson) {
   
        return  customerService.update(id, updatePerson);
     }
 
     // Delete person
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Map<String, Object>> deletePerson(@PathVariable String id) {
-       return customerService.delete(id);
+    @DeleteMapping("/delete/{email}")
+    public ResponseEntity<Map<String, Object>> deletePerson(@PathVariable String email) {
+       return customerService.delete(email);
     }
 
     @DeleteMapping("/delete-all")
