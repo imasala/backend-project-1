@@ -1,17 +1,14 @@
 package com.project.backend_project.service;
 
-import java.io.IOException;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.backend_project.enums.Role;
 import com.project.backend_project.enums.TokenType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.backend_project.dto.AuthenticationRequest;
 import com.project.backend_project.dto.AuthenticationResponse;
 import com.project.backend_project.dto.StaffRequest;
@@ -19,7 +16,6 @@ import com.project.backend_project.entities.*;
 import com.project.backend_project.repository.StaffRepo;
 import com.project.backend_project.repository.TokenRepo;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -48,7 +44,7 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(staff);
         var refreshToken = jwtService.generateRefreshToken(staff);
         return AuthenticationResponse.builder()
-        .token(jwtToken)
+        .accessToken(jwtToken)
         .refreshToken(refreshToken)
         .build();
     }
@@ -67,21 +63,21 @@ public class AuthenticationService {
         revokeAllUserTokens(staff);
         saveUserToken(staff, jwtToken);
         return AuthenticationResponse.builder()
-        .token(jwtToken)
+        .accessToken(jwtToken)
         .refreshToken(refreshToken)
         .build();
     }
 
     // Changes here
     private void saveUserToken(Staff staff, String jwtToken) {
-        var token = Token.builder()
+        var accessToken = Token.builder()
         .staff(staff)
         .accessToken(jwtToken)
         .tokenType(TokenType.BEARER)
         .expired(false)
         .revoked(false)
         .build();
-        tokenRepo.save(token);
+        tokenRepo.save(accessToken);
     }
 
     // Changes here
@@ -91,51 +87,51 @@ public class AuthenticationService {
 
         if (validUserTokens.isEmpty())
             return;
-        validUserTokens.forEach(token -> {
-            token.setExpired(true);
-            token.setRevoked(true);
+        validUserTokens.forEach(accessToken -> {
+            accessToken.setExpired(true);
+            accessToken.setRevoked(true);
         });
         
         tokenRepo.saveAll(validUserTokens);
     }
 
-    public void refreshToken(
-        HttpServletRequest request,
-        HttpServletResponse response
-    ) throws IOException {
+    // :::::::::::::::
 
-                final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-                final String refreshToken;
-                final String domainEmail;
+   public AuthenticationResponse refreshToken(HttpServletRequest request) {
 
-                if(authHeader == null || !authHeader.startsWith("Bearer")){
-                    return; // Stops execution if no token
-                }
+    final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-                refreshToken = authHeader.substring(7);
-                domainEmail = jwtService.extractDomainEmail(refreshToken);
-
-                if(domainEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
-                    var userDetails = this.staffRepo.findByDomainEmail(domainEmail).orElseThrow();
-                    
-                    if(jwtService.isTokenValid(refreshToken, userDetails)){
-
-                        var accessToken = jwtService.generateToken(userDetails);
-                        revokeAllUserTokens(userDetails);
-                        saveUserToken(userDetails, accessToken);
-
-                        var authResponse = AuthenticationResponse.builder()
-                        .token(accessToken)
-                        .refreshToken(refreshToken)
-                        .build();
-
-                    new  ObjectMapper().writeValue(response.getOutputStream(), authResponse);
-                    }
-                }
-
-
-
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        return null; // controller will return 200 with null (or we can change that)
     }
+
+    String refreshToken = authHeader.substring(7);
+    String domainEmail = jwtService.extractDomainEmail(refreshToken);
+
+    if (domainEmail == null) {
+        return null;
+    }
+
+    var user = staffRepo.findByDomainEmail(domainEmail).orElseThrow();
+
+    if (!jwtService.isTokenValid(refreshToken, user)) {
+        return null;
+    }
+
+    // Generate new access accessToken
+    String newAccessToken = jwtService.generateToken(user);
+
+    // Update accessToken repository
+    revokeAllUserTokens(user);
+    saveUserToken(user, newAccessToken);
+
+    // Return everything to controller
+    return AuthenticationResponse.builder()
+            .accessToken(newAccessToken)
+            .refreshToken(refreshToken)
+            .build();
+}
+
 
     
 }

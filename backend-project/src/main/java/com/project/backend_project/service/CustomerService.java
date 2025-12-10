@@ -99,10 +99,6 @@ public class CustomerService {
             return ResponseEntity.badRequest().body(responseBody);
         }
 
-        if(updateCustomerRequest.getEmail() != null){
-            existingPerson.setEmail(updateCustomerRequest.getEmail());
-        }
-
         CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getFirstName(), "First Name");
         CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getMiddleName(), "Middle Name");
         CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getLastName(), "Last Name");
@@ -113,22 +109,32 @@ public class CustomerService {
         CleanAndValidate.cleanAndValidateName(updateCustomerRequest.getAddress(), "Address");
 
          // Validating Identification Number
-         if(updateCustomerRequest.getIdentificationNumber()!= null){
+         if(updateCustomerRequest.getIdentificationNumber()!= null && 
+            !updateCustomerRequest.getIdentificationNumber().equals(existingPerson.getIdentificationNumber())){
             format.formatIdentificationNumber(existingPerson, updateCustomerRequest);
-         }else{
-            existingPerson.setIdentificationNumber(existingPerson.getIdentificationNumber());
-         }  
+         } 
 
         // Validating contact
-        if (updateCustomerRequest.getContact() != null) {
+        if (updateCustomerRequest.getContact() != null && 
+        !updateCustomerRequest.getContact().equals(existingPerson.getContact())
+        ) {
         format.formatContact(existingPerson, updateCustomerRequest);  
-        }else{
-            existingPerson.setContact(existingPerson.getContact());
         }
 
         // Validating date
         if (updateCustomerRequest.getDateOfBirth() != null){
         format.formatDateOfBirth(existingPerson, updateCustomerRequest);
+        }
+
+        // Validating email
+        if(updateCustomerRequest.getEmail() != null){
+            String newEmail = updateCustomerRequest.getEmail();
+            String oldEmail = existingPerson.getEmail();
+
+            if(!newEmail.equalsIgnoreCase(oldEmail) && customerRepo.existsByEmail(newEmail)){
+                    throw new IllegalArgumentException("Email is already in use");
+            }
+            existingPerson.setEmail(newEmail);
         }
 
         CustomerMapper.updateEntity(existingPerson, updateCustomerRequest);
@@ -142,16 +148,16 @@ public class CustomerService {
     }
 
     // Delete person
-    public ResponseEntity<Map<String, Object>> delete(String lastName){
+    public ResponseEntity<Map<String, Object>> delete(Long id){
         Map<String, Object> responseBody = new HashMap<>();
 
-        if(!customerRepo.existsByLastName(lastName)){
+        if(!customerRepo.existsById(id)){
             responseBody.put(FIELD_STATUS, STATUS_ERROR);
             responseBody.put(FIELD_MESSAGE, "Customer is not found!");
             return ResponseEntity.badRequest().body(responseBody);
         }
 
-        customerRepo.deleteByLastName(lastName);
+        customerRepo.deleteById(id);
         responseBody.put(FIELD_STATUS,STATUS_SUCCESS);
         responseBody.put(FIELD_MESSAGE, "Data is successfully deleted");
 

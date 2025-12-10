@@ -48,9 +48,9 @@ public class CustomerController {
     }
 
     // Delete person
-    @DeleteMapping("/delete/{email}")
-    public ResponseEntity<Map<String, Object>> deletePerson(@PathVariable String email) {
-       return customerService.delete(email);
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Map<String, Object>> deletePerson(@PathVariable Long id) {
+       return customerService.delete(id);
     }
 
     @DeleteMapping("/delete-all")

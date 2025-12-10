@@ -14,7 +14,6 @@ import com.project.backend_project.service.AuthenticationService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,14 +34,13 @@ public class StaffController {
         return ResponseEntity.ok(service.authenticate(staffAuthentication));
     }
 
-     @PostMapping("/refresh-token")
-    public void refreshToken(
-        HttpServletRequest request,
-        HttpServletResponse response
-    ) throws IOException {
-       service.refreshToken(request, response);
+  @PostMapping("/refresh-token")
+  public ResponseEntity<AuthenticationResponse> refreshToken(
+        HttpServletRequest request
+       ) {
+     return ResponseEntity.ok(service.refreshToken(request));
     }
-  
+
 }
 
 
