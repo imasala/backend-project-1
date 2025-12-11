@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.project.backend_project.repository.TokenRepo;
 import com.project.backend_project.service.JwtService;
 
 import org.springframework.lang.NonNull;
@@ -25,6 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final TokenRepo tokenRepo;
  
     @Override
     protected void doFilterInternal(
@@ -43,6 +45,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 jwt = authHeader.substring(7);
                 domainEmail = jwtService.extractDomainEmail(jwt);
 
+                var storedToken = tokenRepo.findByAccessToken(jwt).orElse(null);
+
+                if(storedToken == null || 
+                    storedToken.isExpired() ||
+                    storedToken.isRevoked()
+                ){
+                    filterChain.doFilter(request, response);
+                    logger.info("Token is invalid, expired, or revoked.");
+                    return;
+                }
+
+
                 if(domainEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
                     UserDetails userDetails = this.userDetailsService.loadUserByUsername(domainEmail);
                     if(jwtService.isTokenValid(jwt, userDetails)){
@@ -55,8 +69,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             new WebAuthenticationDetailsSource().buildDetails(request)
                         );
                         SecurityContextHolder.getContext().setAuthentication(authToken);
-
                     }
+
                 }
                 filterChain.doFilter(request, response);
     }

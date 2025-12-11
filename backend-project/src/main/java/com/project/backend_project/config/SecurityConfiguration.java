@@ -37,7 +37,7 @@ public class SecurityConfiguration {
                         // New lambda syntax for authorization
                         .authorizeHttpRequests(auth -> auth
                                 .requestMatchers(
-                                    "/api/v1/staffs/**",
+                                    "/api/v1/staffs/login**",
                                     "/api/v1/customers/**",
                                     "/v2/api-docs",
                                     "/v3/api-docs",

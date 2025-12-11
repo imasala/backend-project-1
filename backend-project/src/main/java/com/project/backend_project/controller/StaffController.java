@@ -2,7 +2,6 @@ package com.project.backend_project.controller;
 
 import lombok.RequiredArgsConstructor;
 
-import java.io.IOException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +23,7 @@ public class StaffController {
     
     private final AuthenticationService service;
 
-    @PostMapping("/create")
+    @PostMapping("/auth/create")
     public ResponseEntity<AuthenticationResponse> staffRegister(@RequestBody StaffRequest request){ 
         return ResponseEntity.ok(service.staffRequest(request));
     }
