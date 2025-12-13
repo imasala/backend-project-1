@@ -18,13 +18,13 @@ public class JwtService {
     private static final long EXPIRATION_TIME = (long) 1000 * 60 * 60; // 1 hour
     private static final long REFRESH_EXPIRATION_TIME = (long) 1000 * 60 * 60 * 24 * 7; // 7 days
 
-    public String extractDomainEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    public <T> T extractClaim(String token, Function<Claims, T> claimResolver){
+     public <T> T extractClaim(String token, Function<Claims, T> claimResolver){
         final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);     
+    }
+    
+    public String extractDomainEmail(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
     public String generateToken(UserDetails userDetails){

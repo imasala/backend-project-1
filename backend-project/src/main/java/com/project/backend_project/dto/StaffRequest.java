@@ -1,5 +1,7 @@
 package com.project.backend_project.dto;
 
+import com.project.backend_project.enums.Role;
+
 import lombok.*;
 
 @Data
@@ -12,5 +14,6 @@ public class StaffRequest {
     private String lastName;
     private String domainEmail;
     private String domainPassword;
+    private Role role;
 
 }

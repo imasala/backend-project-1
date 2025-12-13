@@ -1,5 +1,6 @@
 package com.project.backend_project.entities;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,16 +25,13 @@ public class Staff implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "First name is required")
-    @Size(min=3, message="First name must have at least more 3 characters")
+    @Column(nullable = false)
     private String firstName;
 
-    @NotBlank(message = "Middle name is required")
-    @Size(min=3, message="Middle name must have at least more 3 characters")
+    @Column(nullable = false)
     private String middleName;
-    
-    @NotBlank(message = "Last name is required")
-    @Size(min=3, message="Last name must have at least more 3 characters")
+
+    @Column(nullable = false)
     private String lastName;
 
     @Email(message = "Email must be valid")
@@ -43,6 +41,14 @@ public class Staff implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(
+    mappedBy = "staff",
+    cascade = CascadeType.REMOVE,
+    orphanRemoval = true
+    )
+    private List<Token> tokens = new ArrayList<>();
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

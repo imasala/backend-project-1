@@ -1,6 +1,8 @@
 package com.project.backend_project.service;
 
 
+import java.util.Map;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,24 +31,36 @@ public class AuthenticationService {
     private final JwtService jwtService; 
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse staffRequest(StaffRequest request){
+    public Map<String, Object> staffRequest(StaffRequest request){
+
+        Role role = request.getRole();
+
+        if(role == null){
+            role = Role.USER; // Default role
+        }
+
+        if(role != Role.ADMIN && role != Role.USER){
+            throw new IllegalArgumentException("Invalid role specified");
+        }
+
+
         var staff = Staff.builder()
         .firstName(request.getFirstName())
         .middleName(request.getMiddleName())
         .lastName(request.getLastName())
         .domainEmail(request.getDomainEmail())
         .domainPassword(passwordEncoder.encode(request.getDomainPassword()))
-        .role(Role.USER)
+        .role(role)
         .build();
 
         staffRepo.save(staff);
 
-        var jwtToken = jwtService.generateToken(staff);
-        var refreshToken = jwtService.generateRefreshToken(staff);
-        return AuthenticationResponse.builder()
-        .accessToken(jwtToken)
-        .refreshToken(refreshToken)
-        .build();
+        return Map.of(
+            "status", "Success",
+            "message", "Staff registered successfully",
+            "role", role.name()
+        );
+
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request){
@@ -131,7 +145,6 @@ public class AuthenticationService {
             .refreshToken(refreshToken)
             .build();
 }
-
 
     
 }
