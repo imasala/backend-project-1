@@ -3,9 +3,11 @@ package com.project.backend_project.error_handling;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +45,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    // Handle BadCredentialsException
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
         Map<String, String> response = new HashMap<>();
@@ -50,5 +53,16 @@ public class GlobalExceptionHandler {
         response.put("message", "Incorrect email or password");
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED); // 401
 }
+
+// Handles AccessDeniedException
+ @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, String>> handleAccessDeniedException(AccessDeniedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(Map.of(
+                        "error", "FORBIDDEN",
+                        "message", "You do not have permission to access this resource"
+                ));
+    }
 
 }

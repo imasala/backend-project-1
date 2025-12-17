@@ -15,8 +15,8 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
 
     private static final String SECRET_KEY = "bbdcd54305a38ef0b53460567e3fc060216fb3a08a345bacd7a452d468b8fc58";
-    private static final long EXPIRATION_TIME = (long) 1000 * 60 * 60; // 1 hour
-    private static final long REFRESH_EXPIRATION_TIME = (long) 1000 * 60 * 60 * 24 * 7; // 7 days
+    private static final long EXPIRATION_TIME = (long) 1000 * 20 ; // 20 seconds
+    private static final long REFRESH_EXPIRATION_TIME = (long) 1000 * 60 * 60 * 8; // 8 hours
 
      public <T> T extractClaim(String token, Function<Claims, T> claimResolver){
         final Claims claims = extractAllClaims(token);
@@ -39,7 +39,7 @@ public class JwtService {
         return buildToken(new HashMap<>(), userDetails, REFRESH_EXPIRATION_TIME);
     }
 
-    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expirationTime){
+    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expirationTime) {
         return Jwts
         .builder()
         .setClaims(extraClaims)
