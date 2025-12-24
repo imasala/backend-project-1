@@ -37,7 +37,6 @@ public class CustomerMapper {
         customer.setSpouseName(dto.getSpouseName());
         customer.setIdentificationType(dto.getIdentificationType());
         customer.setAddress(dto.getAddress());
-        // customer.setEmail(dto.getEmail());
     }
 
     // Convert Entity to DTO (optional, for responses)

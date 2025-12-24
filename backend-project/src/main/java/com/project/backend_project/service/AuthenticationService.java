@@ -3,7 +3,6 @@ package com.project.backend_project.service;
 
 import java.util.Map;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +16,6 @@ import com.project.backend_project.dto.StaffRequest;
 import com.project.backend_project.entities.*;
 import com.project.backend_project.repository.StaffRepo;
 import com.project.backend_project.repository.TokenRepo;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -111,15 +109,8 @@ public class AuthenticationService {
 
     // :::::::::::::::
 
-   public AuthenticationResponse refreshToken(HttpServletRequest request) {
+   public AuthenticationResponse refreshToken(String refreshToken) {
 
-    final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-        return null; // controller will return 200 with null (or we can change that)
-    }
-
-    String refreshToken = authHeader.substring(7);
     String domainEmail = jwtService.extractDomainEmail(refreshToken);
 
     if (domainEmail == null) {
@@ -142,7 +133,7 @@ public class AuthenticationService {
     // Return everything to controller
     return AuthenticationResponse.builder()
             .accessToken(newAccessToken)
-            .refreshToken(refreshToken)
+            // .refreshToken(refreshToken)
             .build();
 }
 

@@ -24,13 +24,8 @@ public class StaffService {
             "message", "Staff deleted successfully"
         );
     } else {
-        return Map.of(
-            "status", "Failure",
-            "message", "Staff not found"
-        );
+        throw new IllegalArgumentException("Staff not found"); 
     }
 }
-
-
     
 }

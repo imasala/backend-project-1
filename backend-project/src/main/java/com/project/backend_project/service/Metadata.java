@@ -7,8 +7,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class Metadata {
+
+    private Metadata() {
+        // Private constructor to prevent instantiation
+    }
     
-      private static final Map<String, Object> extraData = extraData();
+    static final Map<String, Object> extraData = extraData();
 
     private static Map<String, Object> extraData() {
         Map<String, Object> map = new HashMap<>();

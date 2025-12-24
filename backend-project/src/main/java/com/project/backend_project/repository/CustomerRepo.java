@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface CustomerRepo extends JpaRepository<Customer, Long>{    
 
     List<Customer> findByLastName(String lastName); 
+    List<Customer> findAllByOrderByCreatedAtDesc();
     Optional<Customer> findByEmail(String email);
     boolean existsByEmail(String email);
     void deleteByLastName(String lastName);

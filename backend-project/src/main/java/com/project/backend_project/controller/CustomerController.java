@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -24,8 +25,8 @@ public class CustomerController {
 
     // Create and return response
     @PostMapping("/create")
-    public ResponseEntity< Map<String, Object> > createPerson(@RequestBody CustomerRequest personRequest) {
-        return ResponseEntity.ok(customerService.validation(personRequest));
+    public ResponseEntity< Map<String, Object> > createPerson(@RequestBody CustomerRequest customerRequest) {
+        return ResponseEntity.ok(customerService.validation(customerRequest));
     }
 
     // Fetch all persons
@@ -53,6 +54,7 @@ public class CustomerController {
        return customerService.delete(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete-all")
     public ResponseEntity<Map<String, String>> deleteAllPersons() {
       return customerService.deleteAll();

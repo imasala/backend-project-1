@@ -1,5 +1,15 @@
 package com.project.backend_project.entities;
 
+import java.time.Instant;
+import java.util.Map;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -47,8 +57,22 @@ public class Customer {
     @Column(unique = true)
     private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "staff_id")
+    @Column( name = "metadata", columnDefinition = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private Map<String, Object> metadata;
+
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    private Instant createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "staff_id")   
+    @JsonIgnore 
     private Staff staff;
+
+    @JsonProperty("staffId")
+    public Long getStaffId() {
+        return staff != null ? staff.getId() : null;
+    }
 
 }

@@ -14,8 +14,7 @@ import com.project.backend_project.service.AuthenticationService;
 import com.project.backend_project.service.StaffService;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -47,10 +46,9 @@ public ResponseEntity<AuthenticationResponse> staffLogIn(
 
   @PostMapping("/refresh-token")
     public ResponseEntity<AuthenticationResponse> refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
+            @CookieValue String refreshToken
     ) {  
-        return ResponseEntity.ok( service.refreshToken(request));
+        return ResponseEntity.ok(service.refreshToken(refreshToken));
     }
 
 }

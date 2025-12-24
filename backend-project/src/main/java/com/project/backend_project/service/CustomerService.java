@@ -3,13 +3,16 @@ package com.project.backend_project.service;
 import java.util.*;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.project.backend_project.dto.CustomerRequest;
 import com.project.backend_project.entities.Customer;
+import com.project.backend_project.entities.Staff;
 import com.project.backend_project.mapper.CustomerMapper;
 import com.project.backend_project.repository.CustomerRepo;
+import com.project.backend_project.repository.StaffRepo;
 import com.project.backend_project.service.helper.CleanAndValidate;
 import com.project.backend_project.service.helper.Format;
 
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class CustomerService {
 
     private final CustomerRepo customerRepo;
+    private final StaffRepo staffRepo;
     private final Format format;
 
     private static final String STATUS_SUCCESS = "success";
@@ -29,7 +33,16 @@ public class CustomerService {
 
     public Map<String, Object> validation(@RequestBody CustomerRequest customerRequest){
 
-        // Convert DTO to Entity
+         // Get logged-in staff email
+            String loggedEmail = SecurityContextHolder.getContext()
+                    .getAuthentication()
+                    .getName();
+
+         // Fetch Staff entity
+            Staff staff = staffRepo.findByDomainEmail(loggedEmail)
+                    .orElseThrow(() -> new RuntimeException("Staff not found"));
+
+         // Convert DTO to Entity
         Customer customer = CustomerMapper.toEntity(customerRequest);
 
         // Validate and Clean names
@@ -62,6 +75,10 @@ public class CustomerService {
         customer.setIdentificationType(identificationType);
         customer.setAddress(address);
         customer.setEmail(email);
+
+        customer.setStaff(staff);
+
+        customer.setMetadata(Metadata.extraData);
         
 
         customerRepo.save(customer);
@@ -76,10 +93,10 @@ public class CustomerService {
 
     
     public List<Customer> getAllPerson(){
-        if(customerRepo.findAll().isEmpty()){
+        if(customerRepo.findAllByOrderByCreatedAtDesc().isEmpty()){
             throw new NoSuchElementException("No data found");
         }
-        return customerRepo.findAll();
+        return customerRepo.findAllByOrderByCreatedAtDesc();
     }
 
     // Fetching customer details by last name
@@ -138,7 +155,9 @@ public class CustomerService {
         }
 
         CustomerMapper.updateEntity(existingPerson, updateCustomerRequest);
-       
+
+        existingPerson.setMetadata(Metadata.extraData);
+
         // Save updated record in the database
         customerRepo.save(existingPerson);
         

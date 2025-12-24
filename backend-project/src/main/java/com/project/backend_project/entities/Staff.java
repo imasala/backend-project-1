@@ -1,6 +1,5 @@
 package com.project.backend_project.entities;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,21 +33,14 @@ public class Staff implements UserDetails {
     @Column(nullable = false)
     private String lastName;
 
-    @Email(message = "Email must be valid")
+    @Email
+    @Column(unique = true, nullable = false)
     private String domainEmail;
 
     private String domainPassword;
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @OneToMany(
-    mappedBy = "staff",
-    cascade = CascadeType.REMOVE,
-    orphanRemoval = true
-    )
-    private List<Token> tokens = new ArrayList<>();
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
